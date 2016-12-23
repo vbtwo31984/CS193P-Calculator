@@ -9,7 +9,7 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     @IBOutlet private weak var display: UILabel!
     
     private var userIsInTheMiddleOfTyping = false
@@ -26,16 +26,22 @@ class ViewController: UIViewController {
     
     @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
-        if userIsInTheMiddleOfTyping {
-            let textCurrentlyInDisplay = display.text!
-            display.text = textCurrentlyInDisplay + digit
+        if digit == "." {
+            if display.text!.range(of: digit) == nil {
+                display.text = display.text! + digit
+            }
         }
         else {
-            display.text = digit
+            if userIsInTheMiddleOfTyping {
+                display.text = display.text! + digit
+            }
+            else {
+                display.text = digit
+            }
         }
         userIsInTheMiddleOfTyping = true
     }
-
+    
     @IBAction private func performOperation(_ sender: UIButton) {
         if(userIsInTheMiddleOfTyping) {
             brain.setOperand(displayValue)
@@ -46,6 +52,6 @@ class ViewController: UIViewController {
         }
         displayValue = brain.result
     }
-
+    
 }
 
