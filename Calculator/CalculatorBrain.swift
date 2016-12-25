@@ -8,6 +8,15 @@
 
 import Foundation
 
+func factorial(_ num: UInt64) -> UInt64 {
+    if num == 0 {
+        return 1
+    }
+    else {
+        return num * factorial(num - 1)
+    }
+}
+
 class CalculatorBrain {
     
     private enum Operation {
@@ -37,6 +46,11 @@ class CalculatorBrain {
         "√": Operation.UnaryOperation(sqrt),
         "±": Operation.UnaryOperation({-$0}),
         "cos": Operation.UnaryOperation(cos),
+        "sin": Operation.UnaryOperation(sin),
+        "tan": Operation.UnaryOperation(tan),
+        "x²": Operation.UnaryOperation({$0 * $0}),
+        "x³": Operation.UnaryOperation({$0 * $0 * $0}),
+        "x!": Operation.UnaryOperation({Double(factorial(UInt64($0)))}),
         "×": Operation.BinaryOperation(*),
         "÷": Operation.BinaryOperation(/),
         "+": Operation.BinaryOperation(+),
