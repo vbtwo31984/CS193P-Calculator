@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet private weak var display: UILabel!
+    @IBOutlet private weak var descriptionLabel: UILabel!
     
     private var userIsInTheMiddleOfTyping = false
     private var brain = CalculatorBrain()
@@ -49,8 +50,18 @@ class ViewController: UIViewController {
         }
         if let mathematicalSymbol = sender.currentTitle {
             brain.performOperation(mathematicalSymbol)
+            
+            var descriptionText = brain.description
+            if brain.isPartialResult {
+                descriptionText += "..."
+            }
+            else if mathematicalSymbol == "=" {
+                descriptionText += "="
+            }
+            descriptionLabel.text = descriptionText
         }
         displayValue = brain.result
+        
     }
     
 }

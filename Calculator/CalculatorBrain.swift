@@ -33,6 +33,7 @@ class CalculatorBrain {
     
     private var accumulator = 0.0
     private var pending: PendingBinaryOperationInfo?
+    private var sequence: [String] = []
     
     var result: Double {
         get {
@@ -43,6 +44,31 @@ class CalculatorBrain {
     var isPartialResult: Bool {
         get {
             return pending != nil
+        }
+    }
+    
+    var description: String {
+        get {
+            var desc = " "
+            for item in sequence {
+                desc += " "
+                if let operation = operations[item] {
+                    switch operation {
+                    case .Constant:
+                        desc += item
+                    case .UnaryOperation:
+                        desc = "\(item)(\(desc))"
+                    case .BinaryOperation:
+                        desc += item
+                    case .Equals:
+                        break
+                    }
+                }
+                else {
+                    desc += item
+                }
+            }
+            return desc
         }
     }
     
@@ -65,6 +91,10 @@ class CalculatorBrain {
     ]
     
     func setOperand(_ operand: Double) {
+        if !isPartialResult {
+            sequence.removeAll()
+        }
+        sequence.append(String(operand))
         accumulator = operand
     }
     
@@ -72,7 +102,7 @@ class CalculatorBrain {
         if let operation = operations[symbol] {
             switch operation {
             case .Constant(let constant):
-                accumulator = constant
+                setOperand(constant)
             case .UnaryOperation(let function):
                 accumulator = function(accumulator)
             case .BinaryOperation(let function):
@@ -82,6 +112,7 @@ class CalculatorBrain {
                 executePendingBinaryOperation()
             }
         }
+        sequence.append(symbol)
     }
     
     private func executePendingBinaryOperation() {
