@@ -33,7 +33,9 @@ class CalculatorBrain {
     
     private var accumulator = 0.0
     private var pending: PendingBinaryOperationInfo?
-    private var sequence: [String] = []
+    private var internalDescription = ""
+    private var pendingOperand: String?
+    private var describePendingOperand = false
     
     var result: Double {
         get {
@@ -49,26 +51,12 @@ class CalculatorBrain {
     
     var description: String {
         get {
-            var desc = " "
-            for item in sequence {
-                desc += " "
-                if let operation = operations[item] {
-                    switch operation {
-                    case .Constant:
-                        desc += item
-                    case .UnaryOperation:
-                        desc = "\(item)(\(desc))"
-                    case .BinaryOperation:
-                        desc += item
-                    case .Equals:
-                        break
-                    }
-                }
-                else {
-                    desc += item
-                }
+            if describePendingOperand && pendingOperand != nil {
+                return internalDescription + pendingOperand!
             }
-            return desc
+            else {
+                return internalDescription
+            }
         }
     }
     
@@ -92,9 +80,10 @@ class CalculatorBrain {
     
     func setOperand(_ operand: Double) {
         if !isPartialResult {
-            sequence.removeAll()
+            internalDescription = ""
         }
-        sequence.append(String(operand))
+        pendingOperand = String(operand)
+        describePendingOperand = false
         accumulator = operand
     }
     
@@ -102,17 +91,36 @@ class CalculatorBrain {
         if let operation = operations[symbol] {
             switch operation {
             case .Constant(let constant):
-                setOperand(constant)
+                if !isPartialResult {
+                    internalDescription = ""
+                }
+                pendingOperand = symbol
+                describePendingOperand = true
+                accumulator = constant
             case .UnaryOperation(let function):
+                if let pendingOp = pendingOperand {
+                    internalDescription += "\(symbol)(\(pendingOp))"
+                    pendingOperand = nil
+                }
+                else {
+                    internalDescription = "\(symbol)(\(internalDescription))"
+                }
                 accumulator = function(accumulator)
             case .BinaryOperation(let function):
+                if pendingOperand != nil {
+                    internalDescription += pendingOperand!
+                }
+                internalDescription += " \(symbol) "
                 executePendingBinaryOperation()
                 pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
             case .Equals:
+                if pendingOperand != nil {
+                    internalDescription += pendingOperand!
+                    pendingOperand = nil
+                }
                 executePendingBinaryOperation()
             }
         }
-        sequence.append(symbol)
     }
     
     private func executePendingBinaryOperation() {
