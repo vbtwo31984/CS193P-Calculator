@@ -24,6 +24,7 @@ class CalculatorBrain {
         case UnaryOperation((Double) -> Double)
         case BinaryOperation((Double, Double) -> Double)
         case Equals
+        case Clear
     }
     
     private struct PendingBinaryOperationInfo {
@@ -33,7 +34,7 @@ class CalculatorBrain {
     
     private var accumulator = 0.0
     private var pending: PendingBinaryOperationInfo?
-    private var internalDescription = ""
+    private var internalDescription = " "
     private var pendingOperand: String?
     private var describePendingOperand = false
     
@@ -75,7 +76,8 @@ class CalculatorBrain {
         "÷": Operation.BinaryOperation(/),
         "+": Operation.BinaryOperation(+),
         "−": Operation.BinaryOperation(-),
-        "=": Operation.Equals
+        "=": Operation.Equals,
+        "C": Operation.Clear
     ]
     
     func setOperand(_ operand: Double) {
@@ -119,7 +121,14 @@ class CalculatorBrain {
                     pendingOperand = nil
                 }
                 executePendingBinaryOperation()
+            case .Clear:
+                accumulator = 0.0
+                pending = nil
+                internalDescription = ""
+                pendingOperand = nil
+                describePendingOperand = false
             }
+            
         }
     }
     

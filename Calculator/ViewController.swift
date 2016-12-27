@@ -44,7 +44,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction private func performOperation(_ sender: UIButton) {
-        if(userIsInTheMiddleOfTyping) {
+        if userIsInTheMiddleOfTyping {
             brain.setOperand(displayValue)
             userIsInTheMiddleOfTyping = false
         }
@@ -58,10 +58,22 @@ class ViewController: UIViewController {
             else if mathematicalSymbol == "=" {
                 descriptionText += "="
             }
-            descriptionLabel.text = descriptionText
+            descriptionLabel.text = " " + descriptionText
         }
         displayValue = brain.result
         
+    }
+    
+    @IBAction func backSpace() {
+        if userIsInTheMiddleOfTyping {
+            let lastIndex = display.text!.index(before: display.text!.endIndex)
+            var newDisplayValue = display.text!.substring(to: lastIndex)
+            if newDisplayValue.characters.count == 0 {
+                newDisplayValue = "0"
+                userIsInTheMiddleOfTyping = false
+            }
+            display.text = newDisplayValue
+        }
     }
     
 }
