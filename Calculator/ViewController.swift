@@ -16,12 +16,17 @@ class ViewController: UIViewController {
     private var userIsInTheMiddleOfTyping = false
     private var brain = CalculatorBrain()
     
-    private var displayValue: Double {
+    private var displayValue: Double? {
         get {
             return Double(display.text!)!
         }
         set {
-            display.text = String(newValue)
+            if newValue == nil {
+                display.text = " "
+            }
+            else {
+                display.text = String(newValue!)
+            }
         }
     }
     
@@ -45,7 +50,9 @@ class ViewController: UIViewController {
     
     @IBAction private func performOperation(_ sender: UIButton) {
         if userIsInTheMiddleOfTyping {
-            brain.setOperand(displayValue)
+            if let displayValue = displayValue {
+                brain.setOperand(displayValue)
+            }
             userIsInTheMiddleOfTyping = false
         }
         if let mathematicalSymbol = sender.currentTitle {
