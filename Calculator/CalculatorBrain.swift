@@ -21,6 +21,7 @@ class CalculatorBrain {
     
     private enum Operation {
         case Constant(Double)
+        case NullaryOperation(() -> Double)
         case UnaryOperation((Double) -> Double)
         case BinaryOperation((Double, Double) -> Double)
         case Equals
@@ -76,6 +77,7 @@ class CalculatorBrain {
         "÷": Operation.BinaryOperation(/),
         "+": Operation.BinaryOperation(+),
         "−": Operation.BinaryOperation(-),
+        "rand": Operation.NullaryOperation(drand48),
         "=": Operation.Equals,
         "C": Operation.Clear
     ]
@@ -117,6 +119,13 @@ class CalculatorBrain {
                 internalDescription += " \(symbol) "
                 executePendingBinaryOperation()
                 pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
+            case .NullaryOperation(let function):
+                if !isPartialResult {
+                    internalDescription = ""
+                }
+                pendingOperand = symbol
+                describePendingOperand = true
+                accumulator = function()
             case .Equals:
                 if pendingOperand != nil {
                     internalDescription += pendingOperand!
