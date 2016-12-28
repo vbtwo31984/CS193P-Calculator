@@ -84,7 +84,9 @@ class CalculatorBrain {
         if !isPartialResult {
             internalDescription = ""
         }
-        pendingOperand = String(operand)
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 6
+        pendingOperand = formatter.string(from: NSNumber(value: operand))
         describePendingOperand = false
         accumulator = operand
     }
