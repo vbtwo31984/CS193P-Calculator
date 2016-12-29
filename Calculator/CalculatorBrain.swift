@@ -38,6 +38,27 @@ class CalculatorBrain {
     private var internalDescription = " "
     private var pendingOperand: String?
     private var describePendingOperand = false
+    private var internalProgram = [Any]()
+    
+    typealias PropertyList = Any
+    var program: PropertyList {
+        get {
+            return internalProgram
+        }
+        set {
+            performOperation("C")
+            if let arrayOfOps = newValue as? [Any] {
+                for op in arrayOfOps {
+                    if let operand = op as? Double {
+                        setOperand(operand)
+                    }
+                    else if let operation = op as? String {
+                        performOperation(operation)
+                    }
+                }
+            }
+        }
+    }
     
     var result: Double {
         get {
@@ -91,9 +112,11 @@ class CalculatorBrain {
         pendingOperand = formatter.string(from: NSNumber(value: operand))
         describePendingOperand = false
         accumulator = operand
+        internalProgram.append(operand)
     }
     
     func performOperation(_ symbol: String) {
+        internalProgram.append(symbol)
         if let operation = operations[symbol] {
             switch operation {
             case .Constant(let constant):
@@ -138,6 +161,7 @@ class CalculatorBrain {
                 internalDescription = ""
                 pendingOperand = nil
                 describePendingOperand = false
+                internalProgram.removeAll()
             }
             
         }

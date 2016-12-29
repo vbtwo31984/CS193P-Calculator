@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     
     private var userIsInTheMiddleOfTyping = false
     private var brain = CalculatorBrain()
+    private var savedProgram: CalculatorBrain.PropertyList?
     
     private var displayValue: Double? {
         get {
@@ -50,6 +51,17 @@ class ViewController: UIViewController {
         userIsInTheMiddleOfTyping = true
     }
     
+    private func setDescriptionDisplay() {
+        var descriptionText = brain.description
+        if brain.isPartialResult {
+            descriptionText += "..."
+        }
+        else {
+            descriptionText += "="
+        }
+        descriptionLabel.text = " " + descriptionText
+    }
+    
     @IBAction private func performOperation(_ sender: UIButton) {
         if userIsInTheMiddleOfTyping {
             if let displayValue = displayValue {
@@ -60,17 +72,10 @@ class ViewController: UIViewController {
         if let mathematicalSymbol = sender.currentTitle {
             brain.performOperation(mathematicalSymbol)
             
-            var descriptionText = brain.description
-            if brain.isPartialResult {
-                descriptionText += "..."
-            }
-            else if mathematicalSymbol == "=" {
-                descriptionText += "="
-            }
-            descriptionLabel.text = " " + descriptionText
+            
         }
         displayValue = brain.result
-        
+        setDescriptionDisplay()
     }
     
     @IBAction func backSpace() {
@@ -82,6 +87,18 @@ class ViewController: UIViewController {
                 userIsInTheMiddleOfTyping = false
             }
             display.text = newDisplayValue
+        }
+    }
+    
+    @IBAction func save() {
+        savedProgram = brain.program
+    }
+    
+    @IBAction func restore() {
+        if savedProgram != nil {
+            brain.program = savedProgram!
+            displayValue = brain.result
+            setDescriptionDisplay()
         }
     }
     
